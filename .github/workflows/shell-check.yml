@@ -1,0 +1,16 @@
+name: shell-check
+
+on:
+  push:
+  pull_request:
+
+jobs:
+  shell-check:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Check shell syntax
+        run: |
+          for file in *.sh; do
+            sh -n "$file"
+          done

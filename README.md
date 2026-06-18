@@ -109,6 +109,15 @@ sh /tmp/passwall-run/PassWall_26.6.2_x86_64_all_sdk_24.10.run
 | `aarch64_a53` | `aarch64_cortex-a53` | Cortex-A53 ARM64 |
 | `aarch64_a72` | `aarch64_cortex-a72` | Cortex-A72 ARM64 |
 
+PassWall 26.6.2 `.run` 下载：
+
+| 架构 | GitHub | Gitee |
+|------|--------|-------|
+| `x86_64` | [下载](https://github.com/slobys/openwrt-official-one-click/releases/latest/download/PassWall_26.6.2_x86_64_all_sdk_24.10.run) | [下载](https://gitee.com/naiyou88/openwrt-official-one-click/releases/download/passwall-26.6.2/PassWall_26.6.2_x86_64_all_sdk_24.10.run) |
+| `aarch64_generic` | [下载](https://github.com/slobys/openwrt-official-one-click/releases/latest/download/PassWall_26.6.2_aarch64_generic_all_sdk_24.10.run) | [下载](https://gitee.com/naiyou88/openwrt-official-one-click/releases/download/passwall-26.6.2/PassWall_26.6.2_aarch64_generic_all_sdk_24.10.run) |
+| `aarch64_a53` | [下载](https://github.com/slobys/openwrt-official-one-click/releases/latest/download/PassWall_26.6.2_aarch64_a53_all_sdk_24.10.run) | [下载](https://gitee.com/naiyou88/openwrt-official-one-click/releases/download/passwall-26.6.2/PassWall_26.6.2_aarch64_a53_all_sdk_24.10.run) |
+| `aarch64_a72` | [下载](https://github.com/slobys/openwrt-official-one-click/releases/latest/download/PassWall_26.6.2_aarch64_a72_all_sdk_24.10.run) | [下载](https://gitee.com/naiyou88/openwrt-official-one-click/releases/download/passwall-26.6.2/PassWall_26.6.2_aarch64_a72_all_sdk_24.10.run) |
+
 旧的 APK 文件夹方式仍然保留：
 
 1. Windows 电脑运行 `download-passwall-windows.bat`。

@@ -37,6 +37,7 @@ openwrt-easy --init
 openwrt-easy --expand-overlay
 openwrt-easy --passwall
 openwrt-easy --passwall-local
+openwrt-easy --passwall-run
 openwrt-easy --argon
 openwrt-easy --doctor
 ```
@@ -48,8 +49,9 @@ openwrt-easy --doctor
 2. 自定义 overlay 扩容
 3. 在线安装 / 更新 PassWall
 4. 安装 /tmp/passwall 本地离线 APK 包
-5. 安装 Argon 主题
-6. 查看系统信息
+5. 安装 /tmp/passwall-run 本地 .run 包
+6. 安装 Argon 主题
+7. 查看系统信息
 0. 退出
 ```
 
@@ -58,7 +60,7 @@ openwrt-easy --doctor
 - 基础初始化：安装 SFTP、中文语言包、常用下载工具，重启 LuCI 服务。
 - overlay 扩容：检测 overlayfs、选择磁盘、创建 ext4 分区、写入 fstab。
 - PassWall 安装：识别架构和 25.12 目录，自动下载主程序、中文包和常用运行依赖。
-- 离线安装：SourceForge 在软路由上慢时，先用 Windows 工具把 APK 下载到电脑，再上传到 `/tmp/passwall` 安装。
+- 离线安装：SourceForge 在软路由上慢时，优先下载对应架构的 `.run` 包，上传到 OpenWrt 后一条命令安装。
 - Argon 主题：下载并安装教程里的主题 APK。
 
 不建议脚本硬做的部分：
@@ -82,6 +84,32 @@ openwrt-easy --passwall
 - 下载到临时目录后用 `apk add --allow-untrusted` 一次安装。
 
 如果 SourceForge 在软路由上下载很慢：
+
+1. Windows 电脑运行 `download-passwall-run-windows.bat`，或在 Release 页面下载对应架构的 `.run` 文件。
+2. 上传到软路由 `/tmp/passwall-run`，例如 `/tmp/passwall-run/PassWall_26.6.2_x86_64_all_sdk_24.10.run`。
+3. SSH 执行：
+
+```sh
+mkdir -p /tmp/passwall-run
+openwrt-easy --passwall-run
+```
+
+也可以直接执行：
+
+```sh
+sh /tmp/passwall-run/PassWall_26.6.2_x86_64_all_sdk_24.10.run
+```
+
+当前预打包方向：
+
+| 文件名架构 | 上游包目录 | 常见设备 |
+|------------|------------|----------|
+| `x86_64` | `x86_64` | x86 软路由 |
+| `aarch64_generic` | `aarch64_generic` | NanoPi R4S / R5S / R6S 等常见 ARM64 |
+| `aarch64_a53` | `aarch64_cortex-a53` | Cortex-A53 ARM64 |
+| `aarch64_a72` | `aarch64_cortex-a72` | Cortex-A72 ARM64 |
+
+旧的 APK 文件夹方式仍然保留：
 
 1. Windows 电脑运行 `download-passwall-windows.bat`。
 2. 按提示输入架构，例如 `aarch64_generic`。
@@ -110,15 +138,42 @@ apk add --allow-untrusted ./*.apk
 | `system-init.sh` | 中文界面、SFTP、常用工具 |
 | `expand-overlay.sh` | overlay 扩容 |
 | `passwall.sh` | PassWall 在线 / 本地 APK 安装 |
+| `passwall-run-install.sh` | 执行上传到 `/tmp/passwall-run` 的 `.run` 包 |
+| `build-passwall-run.sh` | 生成 PassWall 自解压 `.run` 包 |
 | `theme-argon.sh` | Argon 主题安装 |
 | `doctor.sh` | 查看系统、架构、空间信息 |
+| `download-passwall-run-windows.bat` | Windows 电脑端下载 `.run` 离线包 |
 | `download-passwall-windows.bat` | Windows 电脑端离线下载 APK |
+
+## 维护者打包
+
+在电脑或服务器上执行：
+
+```sh
+sh build-passwall-run.sh --all
+```
+
+会生成：
+
+```text
+dist/passwall-run/PassWall_<版本>_x86_64_all_sdk_24.10.run
+dist/passwall-run/PassWall_<版本>_aarch64_generic_all_sdk_24.10.run
+dist/passwall-run/PassWall_<版本>_aarch64_a53_all_sdk_24.10.run
+dist/passwall-run/PassWall_<版本>_aarch64_a72_all_sdk_24.10.run
+```
+
+单独打一个架构：
+
+```sh
+sh build-passwall-run.sh --arch aarch64_generic
+```
 
 ## 注意
 
 - 当前重点适配 OpenWrt 25.12+ / `apk`。
 - overlay 扩容会修改分区表，执行前先备份配置。
 - PassWall 是否有对应架构包取决于上游构建。
+- `.run` 包内置 PassWall 上游 APK，但系统基础依赖仍可能需要 OpenWrt 官方源可访问。
 - 脚本不会自动修改 PassWall 配置。
 
 ## 致谢

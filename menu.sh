@@ -15,6 +15,7 @@ usage() {
   sh menu.sh --expand-overlay
   sh menu.sh --passwall
   sh menu.sh --passwall-local
+  sh menu.sh --passwall-run [run文件路径]
   sh menu.sh --argon
   sh menu.sh --doctor
 EOF
@@ -27,6 +28,7 @@ run_action() {
         --expand-overlay) run_script expand-overlay.sh ;;
         --passwall) run_script passwall.sh ;;
         --passwall-local) run_script passwall.sh --local ;;
+        --passwall-run) shift; run_script passwall-run-install.sh "$@" ;;
         --argon) run_script theme-argon.sh ;;
         --doctor) run_script doctor.sh ;;
         --help|-h) usage ;;
@@ -47,20 +49,22 @@ while :; do
 2. 自定义 overlay 扩容
 3. 在线安装 / 更新 PassWall
 4. 安装 /tmp/passwall 本地离线 APK 包
-5. 安装 Argon 主题
-6. 查看系统信息
+5. 安装 /tmp/passwall-run 本地 .run 包
+6. 安装 Argon 主题
+7. 查看系统信息
 0. 退出
 ===========================================================
 EOF
-    printf "请输入选项 [0-6]: "
+    printf "请输入选项 [0-7]: "
     read choice
     case "$choice" in
         1) run_script system-init.sh ;;
         2) run_script expand-overlay.sh ;;
         3) run_script passwall.sh ;;
         4) run_script passwall.sh --local ;;
-        5) run_script theme-argon.sh ;;
-        6) run_script doctor.sh ;;
+        5) run_script passwall-run-install.sh ;;
+        6) run_script theme-argon.sh ;;
+        7) run_script doctor.sh ;;
         0) exit 0 ;;
         *) warn "无效选项" ;;
     esac

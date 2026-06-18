@@ -42,6 +42,12 @@ openwrt-easy --argon
 openwrt-easy --doctor
 ```
 
+如果之前已经安装过旧版菜单，先强制刷新一次：
+
+```sh
+OPENWRT_EASY_FORCE_UPDATE=1 openwrt-easy
+```
+
 ## 菜单功能
 
 ```text
@@ -91,7 +97,7 @@ openwrt-easy --passwall
 
 ```sh
 mkdir -p /tmp/passwall-run
-openwrt-easy --passwall-run
+OPENWRT_EASY_FORCE_UPDATE=1 openwrt-easy --passwall-run
 ```
 
 也可以直接执行：

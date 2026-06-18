@@ -217,10 +217,10 @@ mkdir -p /tmp/passwall
 /tmp/passwall
 
 3. SSH 执行：
-curl -fsSL -o /usr/bin/openwrt-easy https://raw.githubusercontent.com/slobys/openwrt-official-one-click/main/bootstrap.sh && chmod +x /usr/bin/openwrt-easy && openwrt-easy --passwall-local
+wget --no-check-certificate -qO /usr/bin/openwrt-easy https://raw.githubusercontent.com/slobys/openwrt-official-one-click/main/bootstrap.sh && chmod +x /usr/bin/openwrt-easy && openwrt-easy --passwall-local
 
 如果 GitHub raw 慢，可改用 Gitee：
-curl -fsSL -o /usr/bin/openwrt-easy https://gitee.com/naiyou88/openwrt-official-one-click/raw/main/bootstrap.sh && chmod +x /usr/bin/openwrt-easy && openwrt-easy --passwall-local
+wget --no-check-certificate -qO /usr/bin/openwrt-easy https://gitee.com/naiyou88/openwrt-official-one-click/raw/main/bootstrap.sh && chmod +x /usr/bin/openwrt-easy && openwrt-easy --passwall-local
 
 也可以直接执行：
 cd /tmp/passwall

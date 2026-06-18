@@ -7,13 +7,19 @@
 推荐安装一个菜单命令，后续直接输入 `openwrt-easy`：
 
 ```sh
+wget --no-check-certificate -qO /usr/bin/openwrt-easy https://raw.githubusercontent.com/slobys/openwrt-official-one-click/main/bootstrap.sh && chmod +x /usr/bin/openwrt-easy && openwrt-easy
+```
+
+如果系统已经有 `curl`，也可以用：
+
+```sh
 curl -fsSL -o /usr/bin/openwrt-easy https://raw.githubusercontent.com/slobys/openwrt-official-one-click/main/bootstrap.sh && chmod +x /usr/bin/openwrt-easy && openwrt-easy
 ```
 
 国内用户可用 Gitee：
 
 ```sh
-curl -fsSL -o /usr/bin/openwrt-easy https://gitee.com/naiyou88/openwrt-official-one-click/raw/main/bootstrap.sh && chmod +x /usr/bin/openwrt-easy && openwrt-easy
+wget --no-check-certificate -qO /usr/bin/openwrt-easy https://gitee.com/naiyou88/openwrt-official-one-click/raw/main/bootstrap.sh && chmod +x /usr/bin/openwrt-easy && openwrt-easy
 ```
 
 完整项目方式：

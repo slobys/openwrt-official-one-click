@@ -20,6 +20,5 @@ fi
 
 log "执行 PassWall .run 安装包: $run_file"
 sh "$run_file"
-install_passwall_nft_kmods
 refresh_luci
-log "PassWall nftables 透明代理依赖检查完成"
+log "PassWall .run 安装完成"

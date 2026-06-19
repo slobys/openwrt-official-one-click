@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.4.3
+
+- PassWall `.run` 安装时抑制 APK 自带的 `rpcd reload`，避免通过 iStore 安装仍触发 LuCI “丢失登录状态”弹窗。
+- PassWall 安装后补齐默认核心路径，并校验 `/usr/bin/xray`、`/usr/bin/sing-box`，避免 VLESS 订阅因核心未识别被全部跳过。
+- 通用 LuCI 刷新逻辑改为只清缓存，不再重启或 reload Web 登录相关服务。
+
 ## 0.4.2
 
 - iStore 安装默认改为仓库直装，避开 GitHub 官方 `istore-reinstall.run` 在国内网络下长时间超时。

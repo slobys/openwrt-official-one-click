@@ -90,8 +90,8 @@ download_file() {
 
 refresh_luci() {
     rm -rf /tmp/luci-* /tmp/.luci* /var/run/luci-indexcache 2>/dev/null || true
-    [ -x /etc/init.d/rpcd ] && /etc/init.d/rpcd restart >/dev/null 2>&1 || true
-    [ -x /etc/init.d/uhttpd ] && /etc/init.d/uhttpd restart >/dev/null 2>&1 || true
+    rm -f /tmp/luci-indexcache.* 2>/dev/null || true
+    rm -rf /tmp/luci-modulecache 2>/dev/null || true
 }
 
 install_passwall_nft_kmods() {
@@ -112,6 +112,59 @@ install_passwall_nft_kmods() {
         modprobe nft_socket >/dev/null 2>&1 || true
         modprobe nft_tproxy >/dev/null 2>&1 || true
     fi
+}
+
+run_passwall_postinst_basics() {
+    [ -s /lib/functions.sh ] || return 0
+    # shellcheck disable=SC1091
+    . /lib/functions.sh
+
+    for pkgname in \
+        luci-app-passwall luci-i18n-passwall-zh-cn \
+        xray-core sing-box hysteria chinadns-ng dns2socks tcping geoview \
+        v2ray-geoip v2ray-geosite
+    do
+        export root=""
+        export pkgname
+        add_group_and_user >/dev/null 2>&1 || true
+        default_postinst >/dev/null 2>&1 || true
+    done
+}
+
+ensure_passwall_defaults() {
+    if [ ! -s /etc/config/passwall ] && [ -s /usr/share/passwall/0_default_config ]; then
+        mkdir -p /etc/config
+        cp /usr/share/passwall/0_default_config /etc/config/passwall
+    fi
+
+    command -v uci >/dev/null 2>&1 || return 0
+    if ! uci -q show passwall 2>/dev/null | grep -q '=global_app'; then
+        uci -q add passwall global_app >/dev/null 2>&1 || true
+    fi
+
+    uci -q set passwall.@global_app[0].xray_file="/usr/bin/xray" || true
+    uci -q set passwall.@global_app[0].sing_box_file="/usr/bin/sing-box" || true
+    uci -q set passwall.@global_app[0].hysteria_file="/usr/bin/hysteria" || true
+    uci -q set passwall.@global_app[0].geoview_file="/usr/bin/geoview" || true
+    uci -q commit passwall || true
+}
+
+verify_passwall_cores() {
+    missing=""
+    for bin in /usr/bin/xray /usr/bin/sing-box; do
+        [ -x "$bin" ] || missing="$missing $bin"
+    done
+
+    [ -z "$missing" ] || die "PassWall 核心安装不完整，缺少:$missing"
+}
+
+install_passwall_apks() {
+    IPKG_NO_SCRIPT=1 apk add --allow-untrusted "$@"
+    run_passwall_postinst_basics
+    ensure_passwall_defaults
+    install_passwall_nft_kmods
+    verify_passwall_cores
+    refresh_luci
 }
 
 script_dir() {

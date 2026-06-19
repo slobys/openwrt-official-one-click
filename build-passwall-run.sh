@@ -211,6 +211,8 @@ arch_allowed() {
 
 refresh_luci() {
     rm -rf /tmp/luci-* /tmp/.luci* /var/run/luci-indexcache 2>/dev/null || true
+    rm -f /tmp/luci-indexcache.* 2>/dev/null || true
+    rm -rf /tmp/luci-modulecache 2>/dev/null || true
 }
 
 install_passwall_nft_kmods() {
@@ -229,6 +231,49 @@ install_passwall_nft_kmods() {
         modprobe nft_socket >/dev/null 2>&1 || true
         modprobe nft_tproxy >/dev/null 2>&1 || true
     fi
+}
+
+run_passwall_postinst_basics() {
+    [ -s /lib/functions.sh ] || return 0
+    . /lib/functions.sh
+
+    for pkgname in \\
+        luci-app-passwall luci-i18n-passwall-zh-cn \\
+        xray-core sing-box hysteria chinadns-ng dns2socks tcping geoview \\
+        v2ray-geoip v2ray-geosite
+    do
+        export root=""
+        export pkgname
+        add_group_and_user >/dev/null 2>&1 || true
+        default_postinst >/dev/null 2>&1 || true
+    done
+}
+
+ensure_passwall_defaults() {
+    if [ ! -s /etc/config/passwall ] && [ -s /usr/share/passwall/0_default_config ]; then
+        mkdir -p /etc/config
+        cp /usr/share/passwall/0_default_config /etc/config/passwall
+    fi
+
+    command -v uci >/dev/null 2>&1 || return 0
+    if ! uci -q show passwall 2>/dev/null | grep -q '=global_app'; then
+        uci -q add passwall global_app >/dev/null 2>&1 || true
+    fi
+
+    uci -q set passwall.@global_app[0].xray_file="/usr/bin/xray" || true
+    uci -q set passwall.@global_app[0].sing_box_file="/usr/bin/sing-box" || true
+    uci -q set passwall.@global_app[0].hysteria_file="/usr/bin/hysteria" || true
+    uci -q set passwall.@global_app[0].geoview_file="/usr/bin/geoview" || true
+    uci -q commit passwall || true
+}
+
+verify_passwall_cores() {
+    missing=""
+    for bin in /usr/bin/xray /usr/bin/sing-box; do
+        [ -x "\$bin" ] || missing="\$missing \$bin"
+    done
+
+    [ -z "\$missing" ] || die "PassWall 核心安装不完整，缺少:\$missing"
 }
 
 [ "\$(id -u)" = "0" ] || die "请使用 root 用户执行"
@@ -260,12 +305,16 @@ set -- "\$tmp_dir"/apks/*.apk
 [ -e "\$1" ] || die "安装包损坏：没有找到 APK"
 
 log "安装 PassWall \$PASSWALL_VERSION"
-apk add --allow-untrusted "\$@"
+IPKG_NO_SCRIPT=1 apk add --allow-untrusted "\$@"
+run_passwall_postinst_basics
+ensure_passwall_defaults
 install_passwall_nft_kmods
+verify_passwall_cores
 refresh_luci
 
 installed="\$(apk info -a luci-app-passwall 2>/dev/null | sed -n 's/^version: //p' | head -n1 || true)"
 log "安装后版本: \${installed:-unknown}"
+log "核心检查: xray=\$(command -v xray 2>/dev/null || printf missing), sing-box=\$(command -v sing-box 2>/dev/null || printf missing)"
 log "PassWall .run 安装完成"
 exit 0
 

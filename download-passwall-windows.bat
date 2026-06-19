@@ -224,9 +224,8 @@ wget --no-check-certificate -qO /usr/bin/openwrt-easy https://gitee.com/naiyou88
 
 也可以直接执行：
 cd /tmp/passwall
-apk add --allow-untrusted ./*.apk
-/etc/init.d/rpcd restart
-/etc/init.d/uhttpd restart
+IPKG_NO_SCRIPT=1 apk add --allow-untrusted ./*.apk
+rm -rf /tmp/luci-* /tmp/.luci* /var/run/luci-indexcache /tmp/luci-modulecache
 "@
 
 $guidePath = Join-Path $outDir "OpenWrt安装说明.txt"

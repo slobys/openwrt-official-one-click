@@ -19,7 +19,7 @@ curl -fsSL -o /usr/bin/openwrt-easy https://raw.githubusercontent.com/slobys/ope
 国内用户可用 Gitee：
 
 ```sh
-wget --no-check-certificate -qO /usr/bin/openwrt-easy https://gitee.com/naiyou88/openwrt-official-one-click/raw/main/bootstrap.sh && chmod +x /usr/bin/openwrt-easy && openwrt-easy
+wget --no-check-certificate -qO /usr/bin/openwrt-easy https://gitee.com/naiyou88/openwrt-official-one-click/raw/main/bootstrap.sh && chmod +x /usr/bin/openwrt-easy && RAW_BASE=https://gitee.com/naiyou88/openwrt-official-one-click/raw/main openwrt-easy
 ```
 
 完整项目方式：
@@ -47,6 +47,12 @@ openwrt-easy --doctor
 
 ```sh
 OPENWRT_EASY_FORCE_UPDATE=1 openwrt-easy
+```
+
+国内网络刷新可直接走 Gitee：
+
+```sh
+OPENWRT_EASY_FORCE_UPDATE=1 RAW_BASE=https://gitee.com/naiyou88/openwrt-official-one-click/raw/main openwrt-easy
 ```
 
 ## 菜单功能

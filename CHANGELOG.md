@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.3.1
+
+- bootstrap 下载子脚本时增加 GitHub/Gitee 双源 fallback，国内网络可直接用 `RAW_BASE` 指定 Gitee。
+- 基础初始化不再安装会影响 HTTPS 下载的 `wget-nossl`，改用 `wget-ssl`。
+- apk 安装失败时清理缓存、更新列表并重试一次，减少截断包导致的连续失败。
+
 ## 0.3.0
 
 - 增加 iStore 软件中心安装入口，调用官方 `istore-reinstall.run`。

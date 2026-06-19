@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.3.0
+
+- 增加 iStore 软件中心安装入口，调用官方 `istore-reinstall.run`。
+- 安装前限制架构，只允许 `x86_64` 和 `arm64` 设备继续执行。
+- 菜单、命令行和 README 增加 `--istore` 用法。
+
 ## 0.2.0
 
 - 增加 PassWall 自解压 `.run` 包构建脚本，默认打包 `x86_64`、`aarch64_generic`、`aarch64_a53`、`aarch64_a72`。

@@ -42,7 +42,7 @@ fi
 [ "$(id -u)" = "0" ] || die "请使用 root 用户执行"
 mkdir -p "$CACHE_DIR"
 
-for file in common.sh menu.sh system-init.sh expand-overlay.sh passwall.sh passwall-run-install.sh theme-argon.sh doctor.sh; do
+for file in common.sh menu.sh system-init.sh expand-overlay.sh passwall.sh passwall-run-install.sh istore.sh theme-argon.sh doctor.sh; do
     target="$CACHE_DIR/$file"
     if [ ! -s "$target" ] || [ "${OPENWRT_EASY_FORCE_UPDATE:-0}" = "1" ]; then
         log "下载: $file"

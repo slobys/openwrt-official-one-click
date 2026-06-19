@@ -38,6 +38,7 @@ openwrt-easy --expand-overlay
 openwrt-easy --passwall
 openwrt-easy --passwall-local
 openwrt-easy --passwall-run
+openwrt-easy --istore
 openwrt-easy --argon
 openwrt-easy --doctor
 ```
@@ -56,8 +57,9 @@ OPENWRT_EASY_FORCE_UPDATE=1 openwrt-easy
 3. 在线安装 / 更新 PassWall
 4. 安装 /tmp/passwall 本地离线 APK 包
 5. 安装 /tmp/passwall-run 本地 .run 包
-6. 安装 Argon 主题
-7. 查看系统信息
+6. 安装 / 更新 iStore 软件中心
+7. 安装 Argon 主题
+8. 查看系统信息
 0. 退出
 ```
 
@@ -67,6 +69,7 @@ OPENWRT_EASY_FORCE_UPDATE=1 openwrt-easy
 - overlay 扩容：检测 overlayfs、选择磁盘、创建 ext4 分区、写入 fstab。
 - PassWall 安装：识别架构和 25.12 目录，自动下载主程序、中文包和常用运行依赖。
 - 离线安装：SourceForge 在软路由上慢时，优先下载对应架构的 `.run` 包，上传到 OpenWrt 后一条命令安装。
+- iStore 软件中心：下载官方 `istore-reinstall.run` 安装脚本，只允许 `x86_64` 和 `arm64` 设备执行。
 - Argon 主题：下载并安装教程里的主题 APK。
 
 不建议脚本硬做的部分：
@@ -155,6 +158,7 @@ apk add --allow-untrusted ./*.apk
 | `passwall.sh` | PassWall 在线 / 本地 APK 安装 |
 | `passwall-run-install.sh` | 执行上传到 `/tmp/passwall-run` 的 `.run` 包 |
 | `build-passwall-run.sh` | 生成 PassWall 自解压 `.run` 包 |
+| `istore.sh` | 安装 / 更新 iStore 软件中心 |
 | `theme-argon.sh` | Argon 主题安装 |
 | `doctor.sh` | 查看系统、架构、空间信息 |
 | `download-passwall-run-windows.bat` | Windows 电脑端下载 `.run` 离线包 |
@@ -189,10 +193,12 @@ sh build-passwall-run.sh --arch aarch64_generic
 - overlay 扩容会修改分区表，执行前先备份配置。
 - PassWall 是否有对应架构包取决于上游构建。
 - `.run` 包内置 PassWall 上游 APK，但系统基础依赖仍可能需要 OpenWrt 官方源可访问。
+- iStore 官方安装脚本只支持 `x86_64` 和 `arm64` 设备，其它架构会直接退出。
 - 脚本不会自动修改 PassWall 配置。
 
 ## 致谢
 
 - PassWall: <https://github.com/Openwrt-Passwall/openwrt-passwall>
 - PassWall build: <https://sourceforge.net/projects/openwrt-passwall-build/>
+- iStore: <https://github.com/linkease/istore>
 - Argon: <https://github.com/jerrykuku/luci-theme-argon>

@@ -53,36 +53,36 @@ pkg_install_one() {
 }
 
 download_file() {
-    url="$1"
-    output="$2"
-    tmp="$output.tmp.$$"
-    rm -f "$tmp"
+    download_url="$1"
+    download_output="$2"
+    download_tmp="$download_output.tmp.$$"
+    rm -f "$download_tmp"
 
     if command -v curl >/dev/null 2>&1; then
-        if curl -fsSL --retry 3 --connect-timeout 20 "$url" -o "$tmp"; then
-            mv "$tmp" "$output"
+        if curl -fsSL --retry 3 --connect-timeout 20 "$download_url" -o "$download_tmp"; then
+            mv "$download_tmp" "$download_output"
             return 0
         fi
-        if curl -kfsSL --retry 2 --connect-timeout 20 "$url" -o "$tmp"; then
-            mv "$tmp" "$output"
+        if curl -kfsSL --retry 2 --connect-timeout 20 "$download_url" -o "$download_tmp"; then
+            mv "$download_tmp" "$download_output"
             return 0
         fi
     fi
 
     if command -v wget >/dev/null 2>&1; then
-        if wget -qO "$tmp" "$url"; then
-            mv "$tmp" "$output"
+        if wget -qO "$download_tmp" "$download_url"; then
+            mv "$download_tmp" "$download_output"
             return 0
         fi
         if wget --help 2>&1 | grep -q -- '--no-check-certificate'; then
-            if wget --no-check-certificate -qO "$tmp" "$url"; then
-                mv "$tmp" "$output"
+            if wget --no-check-certificate -qO "$download_tmp" "$download_url"; then
+                mv "$download_tmp" "$download_output"
                 return 0
             fi
         fi
     fi
 
-    rm -f "$tmp"
+    rm -f "$download_tmp"
     return 1
 }
 

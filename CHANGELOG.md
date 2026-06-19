@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.3.6
+
+- 修复 `download_file` 内部变量覆盖调用方 `tmp` 的问题，避免 iStore 官方脚本下载后被误判为空文件。
+
 ## 0.3.5
 
 - iStore 安装增加多 URL 尝试，GitHub 官方 `.run` 下载失败时自动回退。

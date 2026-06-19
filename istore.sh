@@ -10,7 +10,7 @@ need_root
 ISTORE_INSTALLER_URL="${ISTORE_INSTALLER_URL:-https://github.com/linkease/openwrt-app-actions/raw/main/applications/luci-app-systools/root/usr/share/systools/istore-reinstall.run}"
 ISTORE_INSTALLER_URLS="${ISTORE_INSTALLER_URLS:-$ISTORE_INSTALLER_URL https://raw.githubusercontent.com/linkease/openwrt-app-actions/main/applications/luci-app-systools/root/usr/share/systools/istore-reinstall.run}"
 ISTORE_STORE_REPOS="${ISTORE_STORE_REPOS:-https://istore.linkease.com/repo/all/store https://istore.istoreos.com/repo/all/store https://repo.istoreos.com/repo/all/store}"
-tmp="/tmp/istore-reinstall.run"
+installer_file="/tmp/istore-reinstall.run"
 
 detect_arch() {
     machine="$(uname -m 2>/dev/null || true)"
@@ -68,7 +68,7 @@ find_pkg_file() {
 download_installer() {
     for url in $ISTORE_INSTALLER_URLS; do
         log "尝试下载: $url"
-        if download_file "$url" "$tmp"; then
+        if download_file "$url" "$installer_file"; then
             return 0
         fi
         warn "下载失败: $url"
@@ -143,11 +143,11 @@ fi
 log "检测到支持架构: $arch"
 log "下载 iStore 官方安装脚本"
 if download_installer; then
-    [ -s "$tmp" ] || die "下载文件为空: $tmp"
-    chmod 755 "$tmp"
+    [ -s "$installer_file" ] || die "下载文件为空: $installer_file"
+    chmod 755 "$installer_file"
 
     log "安装 / 更新 iStore"
-    sh "$tmp"
+    sh "$installer_file"
 else
     warn "官方安装脚本下载失败，改用 iStore 仓库直装"
     install_from_store_repo || die "iStore 仓库直装失败"

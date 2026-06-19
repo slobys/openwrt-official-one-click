@@ -7,22 +7,42 @@ DIR="$(CDPATH= cd -- "$(dirname -- "$0")" && pwd)"
 
 need_root
 
-restore_busybox_wget() {
+restore_openwrt_wget() {
     [ "$(detect_pkg_mgr)" = "apk" ] || return 0
 
-    if [ -x /bin/busybox ]; then
-        warn "恢复 BusyBox wget，避免完整 wget 破坏 apk 下载"
-        ln -sf /bin/busybox /usr/bin/wget
-    fi
+    warn "恢复 OpenWrt 默认 wget，避免完整 wget 破坏 apk 下载"
+    restore_wget_link
 
     apk del wget wget-nossl wget-ssl >/dev/null 2>&1 || true
-    [ -x /bin/busybox ] && ln -sf /bin/busybox /usr/bin/wget
+    restore_wget_link
 
     # Failed apk add attempts can leave missing packages in world and block every
     # later apk operation. Remove only missing helper packages managed here.
     for pkg in openssh-sftp-server luci-i18n-base-zh-cn luci-i18n-firewall-zh-cn; do
         apk info -e "$pkg" >/dev/null 2>&1 || apk del "$pkg" >/dev/null 2>&1 || true
     done
+}
+
+restore_wget_link() {
+    mkdir -p /usr/bin
+
+    if [ -x /bin/uclient-fetch ]; then
+        ln -sf /bin/uclient-fetch /usr/bin/wget
+        return 0
+    fi
+
+    if [ -x /usr/bin/uclient-fetch ]; then
+        ln -sf /usr/bin/uclient-fetch /usr/bin/wget
+        return 0
+    fi
+
+    if [ -x /bin/busybox ] && /bin/busybox wget --help >/dev/null 2>&1; then
+        ln -sf /bin/busybox /usr/bin/wget
+        return 0
+    fi
+
+    warn "没有找到 uclient-fetch 或可用的 BusyBox wget"
+    return 1
 }
 
 install_pkg() {
@@ -49,7 +69,7 @@ install_pkg() {
     return 1
 }
 
-restore_busybox_wget
+restore_openwrt_wget
 
 log "更新软件源"
 pkg_update || warn "软件源更新失败，继续尝试安装常用包"

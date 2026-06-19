@@ -197,7 +197,7 @@ sh build-passwall-run.sh --arch aarch64_generic
 
 - 当前重点适配 OpenWrt 25.12+ / `apk`。
 - overlay 扩容会修改分区表，执行前先备份配置。
-- 基础初始化会恢复 BusyBox wget；OpenWrt 25.12 的 apk 在部分机型上会被完整 wget / wget-nossl 影响。
+- 基础初始化会恢复 OpenWrt 默认的 `uclient-fetch` wget；OpenWrt 25.12 的 apk 在部分机型上会被完整 wget / wget-nossl 影响。
 - PassWall 是否有对应架构包取决于上游构建。
 - `.run` 包内置 PassWall 上游 APK，但系统基础依赖仍可能需要 OpenWrt 官方源可访问。
 - Gitee 可能对 PassWall 相关脚本返回 451；菜单仍可正常打开，PassWall 功能需要 GitHub raw 可访问或使用离线 `.run` 包。

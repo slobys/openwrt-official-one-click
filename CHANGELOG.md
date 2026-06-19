@@ -1,5 +1,10 @@
 # Changelog
 
+## 0.3.4
+
+- 修正 wget 恢复逻辑：OpenWrt 默认应恢复到 `uclient-fetch`，不是 BusyBox。
+- 只有 BusyBox 确认带 wget applet 时才回退使用 BusyBox，避免 `wgetwget: applet not found`。
+
 ## 0.3.3
 
 - 基础初始化改为先恢复 BusyBox wget，再执行 `apk update`。

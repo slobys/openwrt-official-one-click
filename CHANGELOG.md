@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.3.3
+
+- 基础初始化改为先恢复 BusyBox wget，再执行 `apk update`。
+- 不再安装 `wget-ssl`；完整 wget / wget-nossl 在部分 OpenWrt 25.12 设备上会导致 apk 下载索引失败。
+- 清理上次失败安装残留在 apk world 里的初始化包名，避免后续安装一直被缺失包阻塞。
+
 ## 0.3.2
 
 - bootstrap 下载顺序改为主源、Gitee、GitHub，避免指定 Gitee 后无法回退 GitHub。

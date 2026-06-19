@@ -7,8 +7,31 @@ DIR="$(CDPATH= cd -- "$(dirname -- "$0")" && pwd)"
 
 need_root
 
+restore_busybox_wget() {
+    [ "$(detect_pkg_mgr)" = "apk" ] || return 0
+
+    if [ -x /bin/busybox ]; then
+        warn "恢复 BusyBox wget，避免完整 wget 破坏 apk 下载"
+        ln -sf /bin/busybox /usr/bin/wget
+    fi
+
+    apk del wget wget-nossl wget-ssl >/dev/null 2>&1 || true
+    [ -x /bin/busybox ] && ln -sf /bin/busybox /usr/bin/wget
+
+    # Failed apk add attempts can leave missing packages in world and block every
+    # later apk operation. Remove only missing helper packages managed here.
+    for pkg in openssh-sftp-server luci-i18n-base-zh-cn luci-i18n-firewall-zh-cn; do
+        apk info -e "$pkg" >/dev/null 2>&1 || apk del "$pkg" >/dev/null 2>&1 || true
+    done
+}
+
 install_pkg() {
     pkg="$1"
+    had_pkg=0
+    if [ "$(detect_pkg_mgr)" = "apk" ] && apk info -e "$pkg" >/dev/null 2>&1; then
+        had_pkg=1
+    fi
+
     log "安装: $pkg"
     if pkg_install_one "$pkg"; then
         return 0
@@ -19,27 +42,20 @@ install_pkg() {
         rm -f /var/cache/apk/* /tmp/*.apk 2>/dev/null || true
         pkg_update || true
         pkg_install_one "$pkg" && return 0
+        [ "$had_pkg" = "1" ] || apk del "$pkg" >/dev/null 2>&1 || true
     fi
 
     warn "安装失败或软件源不存在: $pkg"
     return 1
 }
 
+restore_busybox_wget
+
 log "更新软件源"
 pkg_update || warn "软件源更新失败，继续尝试安装常用包"
 
 install_pkg ca-bundle || true
 install_pkg curl || true
-
-if [ "$(detect_pkg_mgr)" = "apk" ]; then
-    if apk info -e wget-nossl >/dev/null 2>&1; then
-        warn "检测到 wget-nossl，移除后改装 wget-ssl，避免 HTTPS 软件包下载中断"
-        apk del wget-nossl || true
-    fi
-    install_pkg wget-ssl || true
-else
-    install_pkg wget-ssl || install_pkg wget || true
-fi
 
 for pkg in openssh-sftp-server luci-i18n-base-zh-cn luci-i18n-firewall-zh-cn; do
     install_pkg "$pkg" || true

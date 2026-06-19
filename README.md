@@ -200,6 +200,7 @@ sh build-passwall-run.sh --arch aarch64_generic
 - 基础初始化会恢复 OpenWrt 默认的 `uclient-fetch` wget；OpenWrt 25.12 的 apk 在部分机型上会被完整 wget / wget-nossl 影响。
 - PassWall 是否有对应架构包取决于上游构建。
 - `.run` 包内置 PassWall 上游 APK，但系统基础依赖仍可能需要 OpenWrt 官方源可访问。
+- PassWall 透明代理需要内核匹配的 `kmod-nft-socket` 和 `kmod-nft-tproxy`，脚本会从当前官方源安装，离线 `.run` 仍需要设备能访问 OpenWrt 官方源。
 - Gitee 可能对 PassWall 相关脚本返回 451；菜单仍可正常打开，PassWall 功能需要 GitHub raw 可访问或使用离线 `.run` 包。
 - iStore 官方安装脚本在部分网络下访问 GitHub 会超时；脚本会自动回退到 `istore.linkease.com` / `istore.istoreos.com` / `repo.istoreos.com` 仓库直装。
 - iStore 官方安装脚本只支持 `x86_64` 和 `arm64` 设备，其它架构会直接退出。

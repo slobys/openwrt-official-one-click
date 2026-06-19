@@ -92,6 +92,26 @@ refresh_luci() {
     [ -x /etc/init.d/uhttpd ] && /etc/init.d/uhttpd restart >/dev/null 2>&1 || true
 }
 
+install_passwall_nft_kmods() {
+    [ "$(detect_pkg_mgr)" = "apk" ] || return 0
+
+    missing=""
+    for pkg in kmod-nft-socket kmod-nft-tproxy; do
+        apk info -e "$pkg" >/dev/null 2>&1 || missing="$missing $pkg"
+    done
+
+    [ -n "$missing" ] || return 0
+
+    log "安装 PassWall nftables 透明代理内核依赖:$missing"
+    apk update || warn "apk update 失败，继续尝试安装 kmod"
+    apk add $missing || die "安装 PassWall nftables 透明代理内核依赖失败，请检查官方软件源和内核版本是否匹配"
+
+    if command -v modprobe >/dev/null 2>&1; then
+        modprobe nft_socket >/dev/null 2>&1 || true
+        modprobe nft_tproxy >/dev/null 2>&1 || true
+    fi
+}
+
 script_dir() {
     CDPATH= cd -- "$(dirname -- "$0")" && pwd
 }

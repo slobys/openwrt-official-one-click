@@ -58,6 +58,7 @@ install_local_apks() {
     [ -e "$1" ] || die "没有找到本地 APK: $dir/*.apk"
     log "安装本地 APK: $dir"
     apk add --allow-untrusted "$@"
+    install_passwall_nft_kmods
     refresh_luci
     log "PassWall 本地 APK 安装完成"
 }
@@ -182,6 +183,7 @@ apk update || warn "apk update 失败，将继续尝试安装本地 APK"
 
 log "安装 PassWall APK"
 apk add --allow-untrusted "$download_dir"/*.apk
+install_passwall_nft_kmods
 refresh_luci
 
 NEW_VER="$(apk info -a luci-app-passwall 2>/dev/null | sed -n 's/^version: //p' | head -n1 || true)"

@@ -1,5 +1,10 @@
 # Changelog
 
+## 0.3.7
+
+- PassWall 在线、本地 APK 和 `.run` 安装后自动补装 `kmod-nft-socket`、`kmod-nft-tproxy`。
+- 更新 `.run` 打包模板，新打包的 PassWall 安装包会检查 nftables 透明代理内核依赖。
+
 ## 0.3.6
 
 - 修复 `download_file` 内部变量覆盖调用方 `tmp` 的问题，避免 iStore 官方脚本下载后被误判为空文件。

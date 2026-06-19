@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.3.5
+
+- iStore 安装增加多 URL 尝试，GitHub 官方 `.run` 下载失败时自动回退。
+- 增加 iStore 仓库直装 fallback，从 `luci-app-store` 中提取 `is-opkg` 后安装核心包。
+- 通用下载函数不再无条件调用不兼容的 `wget --no-check-certificate`。
+
 ## 0.3.4
 
 - 修正 wget 恢复逻辑：OpenWrt 默认应恢复到 `uclient-fetch`，不是 BusyBox。

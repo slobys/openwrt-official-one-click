@@ -8,6 +8,8 @@ DIR="$(CDPATH= cd -- "$(dirname -- "$0")" && pwd)"
 need_root
 
 ISTORE_INSTALLER_URL="${ISTORE_INSTALLER_URL:-https://github.com/linkease/openwrt-app-actions/raw/main/applications/luci-app-systools/root/usr/share/systools/istore-reinstall.run}"
+ISTORE_INSTALLER_URLS="${ISTORE_INSTALLER_URLS:-$ISTORE_INSTALLER_URL https://raw.githubusercontent.com/linkease/openwrt-app-actions/main/applications/luci-app-systools/root/usr/share/systools/istore-reinstall.run}"
+ISTORE_STORE_REPOS="${ISTORE_STORE_REPOS:-https://istore.linkease.com/repo/all/store https://istore.istoreos.com/repo/all/store https://repo.istoreos.com/repo/all/store}"
 tmp="/tmp/istore-reinstall.run"
 
 detect_arch() {
@@ -43,6 +45,86 @@ detect_arch() {
     return 1
 }
 
+gzcat_file() {
+    file="$1"
+    if command -v gzip >/dev/null 2>&1; then
+        gzip -dc "$file"
+    else
+        zcat "$file"
+    fi
+}
+
+find_pkg_file() {
+    packages="$1"
+    pkg="$2"
+
+    gzcat_file "$packages" | awk -v pkg="$pkg" '
+        $1 == "Package:" && $2 == pkg { in_pkg = 1; next }
+        $1 == "Package:" { in_pkg = 0 }
+        in_pkg && $1 == "Filename:" { print $2; exit }
+    '
+}
+
+download_installer() {
+    for url in $ISTORE_INSTALLER_URLS; do
+        log "尝试下载: $url"
+        if download_file "$url" "$tmp"; then
+            return 0
+        fi
+        warn "下载失败: $url"
+    done
+
+    return 1
+}
+
+install_from_store_repo() {
+    workdir="/tmp/istore-install.$$"
+    mkdir -p "$workdir"
+    trap 'rm -rf "$workdir"' EXIT INT TERM
+
+    for repo in $ISTORE_STORE_REPOS; do
+        packages="$workdir/Packages.gz"
+        store_ipk="$workdir/luci-app-store.ipk"
+        is_opkg="/tmp/is-opkg"
+
+        log "尝试 iStore 仓库: $repo"
+        download_file "$repo/Packages.gz" "$packages" || {
+            warn "下载 Packages.gz 失败: $repo"
+            continue
+        }
+
+        store_file="$(find_pkg_file "$packages" luci-app-store || true)"
+        [ -n "$store_file" ] || {
+            warn "仓库里没有找到 luci-app-store: $repo"
+            continue
+        }
+
+        download_file "$repo/$store_file" "$store_ipk" || {
+            warn "下载 luci-app-store 失败: $repo/$store_file"
+            continue
+        }
+
+        cat "$store_ipk" | tar -xzO ./data.tar.gz | tar -xzO ./bin/is-opkg > "$is_opkg" || {
+            warn "提取 is-opkg 失败"
+            continue
+        }
+        [ -s "$is_opkg" ] || {
+            warn "is-opkg 文件为空"
+            continue
+        }
+
+        chmod 755 "$is_opkg"
+        "$is_opkg" update
+        "$is_opkg" install --force-reinstall luci-lib-taskd luci-lib-xterm
+        "$is_opkg" install --force-reinstall luci-app-store
+        [ -s "/etc/init.d/tasks" ] || "$is_opkg" install --force-reinstall taskd
+        [ -s "/usr/lib/lua/luci/cbi.lua" ] || "$is_opkg" install luci-compat >/dev/null 2>&1 || true
+        return 0
+    done
+
+    return 1
+}
+
 arch="$(detect_arch || true)"
 [ -n "$arch" ] || die "iStore 官方安装脚本只支持 x86_64 和 arm64 设备"
 
@@ -60,11 +142,15 @@ fi
 
 log "检测到支持架构: $arch"
 log "下载 iStore 官方安装脚本"
-download_file "$ISTORE_INSTALLER_URL" "$tmp" || die "下载 iStore 安装脚本失败"
-[ -s "$tmp" ] || die "下载文件为空: $tmp"
-chmod 755 "$tmp"
+if download_installer; then
+    [ -s "$tmp" ] || die "下载文件为空: $tmp"
+    chmod 755 "$tmp"
 
-log "安装 / 更新 iStore"
-sh "$tmp"
+    log "安装 / 更新 iStore"
+    sh "$tmp"
+else
+    warn "官方安装脚本下载失败，改用 iStore 仓库直装"
+    install_from_store_repo || die "iStore 仓库直装失败"
+fi
 refresh_luci
 log "iStore 安装完成，请在 LuCI 菜单中查看 iStore / 软件中心"

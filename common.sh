@@ -55,17 +55,34 @@ pkg_install_one() {
 download_file() {
     url="$1"
     output="$2"
+    tmp="$output.tmp.$$"
+    rm -f "$tmp"
 
     if command -v curl >/dev/null 2>&1; then
-        curl -fsSL --retry 3 --connect-timeout 20 "$url" -o "$output" && return 0
-        curl -kfsSL --retry 2 --connect-timeout 20 "$url" -o "$output" && return 0
+        if curl -fsSL --retry 3 --connect-timeout 20 "$url" -o "$tmp"; then
+            mv "$tmp" "$output"
+            return 0
+        fi
+        if curl -kfsSL --retry 2 --connect-timeout 20 "$url" -o "$tmp"; then
+            mv "$tmp" "$output"
+            return 0
+        fi
     fi
 
     if command -v wget >/dev/null 2>&1; then
-        wget -qO "$output" "$url" && return 0
-        wget --no-check-certificate -qO "$output" "$url" && return 0
+        if wget -qO "$tmp" "$url"; then
+            mv "$tmp" "$output"
+            return 0
+        fi
+        if wget --help 2>&1 | grep -q -- '--no-check-certificate'; then
+            if wget --no-check-certificate -qO "$tmp" "$url"; then
+                mv "$tmp" "$output"
+                return 0
+            fi
+        fi
     fi
 
+    rm -f "$tmp"
     return 1
 }
 

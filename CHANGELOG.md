@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.3.2
+
+- bootstrap 下载顺序改为主源、Gitee、GitHub，避免指定 Gitee 后无法回退 GitHub。
+- 下载失败不再使用不兼容的 `wget --no-check-certificate`，除非当前 wget 明确支持。
+- PassWall 相关脚本被 Gitee 返回 451 时不再阻塞菜单启动。
+
 ## 0.3.1
 
 - bootstrap 下载子脚本时增加 GitHub/Gitee 双源 fallback，国内网络可直接用 `RAW_BASE` 指定 Gitee。

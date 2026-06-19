@@ -7,19 +7,19 @@
 推荐安装一个菜单命令，后续直接输入 `openwrt-easy`：
 
 ```sh
-wget --no-check-certificate -qO /usr/bin/openwrt-easy https://raw.githubusercontent.com/slobys/openwrt-official-one-click/main/bootstrap.sh && chmod +x /usr/bin/openwrt-easy && openwrt-easy
+curl -kfsSL -o /usr/bin/openwrt-easy https://raw.githubusercontent.com/slobys/openwrt-official-one-click/main/bootstrap.sh && chmod +x /usr/bin/openwrt-easy && openwrt-easy
 ```
 
-如果系统已经有 `curl`，也可以用：
+如果系统没有 `curl`，可以试试 `wget`：
 
 ```sh
-curl -fsSL -o /usr/bin/openwrt-easy https://raw.githubusercontent.com/slobys/openwrt-official-one-click/main/bootstrap.sh && chmod +x /usr/bin/openwrt-easy && openwrt-easy
+wget -qO /usr/bin/openwrt-easy https://raw.githubusercontent.com/slobys/openwrt-official-one-click/main/bootstrap.sh && chmod +x /usr/bin/openwrt-easy && openwrt-easy
 ```
 
 国内用户可用 Gitee：
 
 ```sh
-wget --no-check-certificate -qO /usr/bin/openwrt-easy https://gitee.com/naiyou88/openwrt-official-one-click/raw/main/bootstrap.sh && chmod +x /usr/bin/openwrt-easy && RAW_BASE=https://gitee.com/naiyou88/openwrt-official-one-click/raw/main openwrt-easy
+curl -kfsSL -o /usr/bin/openwrt-easy https://gitee.com/naiyou88/openwrt-official-one-click/raw/main/bootstrap.sh && chmod +x /usr/bin/openwrt-easy && RAW_BASE=https://gitee.com/naiyou88/openwrt-official-one-click/raw/main openwrt-easy
 ```
 
 完整项目方式：
@@ -199,6 +199,7 @@ sh build-passwall-run.sh --arch aarch64_generic
 - overlay 扩容会修改分区表，执行前先备份配置。
 - PassWall 是否有对应架构包取决于上游构建。
 - `.run` 包内置 PassWall 上游 APK，但系统基础依赖仍可能需要 OpenWrt 官方源可访问。
+- Gitee 可能对 PassWall 相关脚本返回 451；菜单仍可正常打开，PassWall 功能需要 GitHub raw 可访问或使用离线 `.run` 包。
 - iStore 官方安装脚本只支持 `x86_64` 和 `arm64` 设备，其它架构会直接退出。
 - 脚本不会自动修改 PassWall 配置。
 

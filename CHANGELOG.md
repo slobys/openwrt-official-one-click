@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.4.1
+
+- PassWall `.run` 安装包不再重启 `rpcd` / `uhttpd`，避免通过 iStore 安装时触发 LuCI “丢失登录状态”弹窗。
+
 ## 0.4.0
 
 - 菜单移除 PassWall 在线安装、本地 APK 安装和 `/tmp/passwall-run` 安装入口，PassWall 改由 iStore 安装。

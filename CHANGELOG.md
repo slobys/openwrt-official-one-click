@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.4.0
+
+- 菜单移除 PassWall 在线安装、本地 APK 安装和 `/tmp/passwall-run` 安装入口，PassWall 改由 iStore 安装。
+- bootstrap 不再下载 PassWall 相关脚本，避免国内网络下被 Gitee 451 或 GitHub 超时拖慢菜单启动。
+- 下载函数增加总超时，避免 iStore 某个下载源长时间卡住不切换。
+
 ## 0.3.7
 
 - PassWall 在线、本地 APK 和 `.run` 安装后自动补装 `kmod-nft-socket`、`kmod-nft-tproxy`。

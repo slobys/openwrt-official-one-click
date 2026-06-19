@@ -9,6 +9,8 @@ RAW_BASE="${RAW_BASE:-$GITHUB_RAW_BASE}"
 GITEE_RAW_BASE="${GITEE_RAW_BASE:-https://gitee.com/naiyou88/openwrt-official-one-click/raw/$BRANCH}"
 CACHE_DIR="/usr/lib/$PROJECT_NAME"
 BIN_NAME="${BIN_NAME:-openwrt-easy}"
+DOWNLOAD_CONNECT_TIMEOUT="${DOWNLOAD_CONNECT_TIMEOUT:-8}"
+DOWNLOAD_MAX_TIME="${DOWNLOAD_MAX_TIME:-25}"
 
 log() {
     printf '%s\n' "==> $*"
@@ -26,11 +28,11 @@ download_file() {
     rm -f "$tmp"
 
     if command -v curl >/dev/null 2>&1; then
-        if curl -fsSL --retry 3 --connect-timeout 20 "$url" -o "$tmp"; then
+        if curl -fsSL --retry 2 --connect-timeout "$DOWNLOAD_CONNECT_TIMEOUT" --max-time "$DOWNLOAD_MAX_TIME" "$url" -o "$tmp"; then
             mv "$tmp" "$output"
             return 0
         fi
-        if curl -kfsSL --retry 2 --connect-timeout 20 "$url" -o "$tmp"; then
+        if curl -kfsSL --retry 1 --connect-timeout "$DOWNLOAD_CONNECT_TIMEOUT" --max-time "$DOWNLOAD_MAX_TIME" "$url" -o "$tmp"; then
             mv "$tmp" "$output"
             return 0
         fi
@@ -86,7 +88,7 @@ fi
 [ "$(id -u)" = "0" ] || die "请使用 root 用户执行"
 mkdir -p "$CACHE_DIR"
 
-for file in common.sh menu.sh system-init.sh expand-overlay.sh passwall.sh passwall-run-install.sh istore.sh theme-argon.sh doctor.sh; do
+for file in common.sh menu.sh system-init.sh expand-overlay.sh istore.sh theme-argon.sh doctor.sh; do
     target="$CACHE_DIR/$file"
     if [ ! -s "$target" ] || [ "${OPENWRT_EASY_FORCE_UPDATE:-0}" = "1" ]; then
         log "下载: $file"

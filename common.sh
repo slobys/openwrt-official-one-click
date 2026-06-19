@@ -3,6 +3,8 @@ set -eu
 
 PROJECT_NAME="openwrt-official-one-click"
 CACHE_DIR="/usr/lib/$PROJECT_NAME"
+DOWNLOAD_CONNECT_TIMEOUT="${DOWNLOAD_CONNECT_TIMEOUT:-8}"
+DOWNLOAD_MAX_TIME="${DOWNLOAD_MAX_TIME:-25}"
 
 log() {
     printf '%s\n' "==> $*"
@@ -59,11 +61,11 @@ download_file() {
     rm -f "$download_tmp"
 
     if command -v curl >/dev/null 2>&1; then
-        if curl -fsSL --retry 3 --connect-timeout 20 "$download_url" -o "$download_tmp"; then
+        if curl -fsSL --retry 2 --connect-timeout "$DOWNLOAD_CONNECT_TIMEOUT" --max-time "$DOWNLOAD_MAX_TIME" "$download_url" -o "$download_tmp"; then
             mv "$download_tmp" "$download_output"
             return 0
         fi
-        if curl -kfsSL --retry 2 --connect-timeout 20 "$download_url" -o "$download_tmp"; then
+        if curl -kfsSL --retry 1 --connect-timeout "$DOWNLOAD_CONNECT_TIMEOUT" --max-time "$DOWNLOAD_MAX_TIME" "$download_url" -o "$download_tmp"; then
             mv "$download_tmp" "$download_output"
             return 0
         fi

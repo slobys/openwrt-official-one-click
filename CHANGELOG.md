@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.4.2
+
+- iStore 安装默认改为仓库直装，避开 GitHub 官方 `istore-reinstall.run` 在国内网络下长时间超时。
+- iStore 安装前主动补装 `curl` / `ca-bundle`，解决新刷机后只有 `wget` 时后续安装不完整的问题。
+- README 增加无 `curl` 环境下的 Gitee `wget` 首装命令。
+
 ## 0.4.1
 
 - PassWall `.run` 安装包不再重启 `rpcd` / `uhttpd`，避免通过 iStore 安装时触发 LuCI “丢失登录状态”弹窗。

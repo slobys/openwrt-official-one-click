@@ -22,6 +22,12 @@ wget -qO /usr/bin/openwrt-easy https://raw.githubusercontent.com/slobys/openwrt-
 curl -kfsSL -o /usr/bin/openwrt-easy https://gitee.com/naiyou88/openwrt-official-one-click/raw/main/bootstrap.sh && chmod +x /usr/bin/openwrt-easy && RAW_BASE=https://gitee.com/naiyou88/openwrt-official-one-click/raw/main openwrt-easy
 ```
 
+国内机器如果没有 `curl`，直接用 Gitee 的 `wget` 命令：
+
+```sh
+wget -qO /usr/bin/openwrt-easy https://gitee.com/naiyou88/openwrt-official-one-click/raw/main/bootstrap.sh && chmod +x /usr/bin/openwrt-easy && RAW_BASE=https://gitee.com/naiyou88/openwrt-official-one-click/raw/main openwrt-easy
+```
+
 完整项目方式：
 
 ```sh
@@ -67,7 +73,7 @@ OPENWRT_EASY_FORCE_UPDATE=1 RAW_BASE=https://gitee.com/naiyou88/openwrt-official
 
 - 基础初始化：安装 SFTP、中文语言包、常用下载工具，重启 LuCI 服务。
 - overlay 扩容：检测 overlayfs、选择磁盘、创建 ext4 分区、写入 fstab。
-- iStore 软件中心：优先下载官方 `istore-reinstall.run`，失败时改用 iStore 仓库直装，只允许 `x86_64` 和 `arm64` 设备执行。
+- iStore 软件中心：优先使用 iStore 仓库直装，失败时改用官方 `istore-reinstall.run`，只允许 `x86_64` 和 `arm64` 设备执行。
 - Argon 主题：下载并安装教程里的主题 APK。
 
 不建议脚本硬做的部分：
@@ -93,7 +99,7 @@ OPENWRT_EASY_FORCE_UPDATE=1 RAW_BASE=https://gitee.com/naiyou88/openwrt-official
 - 当前重点适配 OpenWrt 25.12+ / `apk`。
 - overlay 扩容会修改分区表，执行前先备份配置。
 - 基础初始化会恢复 OpenWrt 默认的 `uclient-fetch` wget；OpenWrt 25.12 的 apk 在部分机型上会被完整 wget / wget-nossl 影响。
-- iStore 官方安装脚本在部分网络下访问 GitHub 会超时；脚本会自动回退到 `istore.linkease.com` / `istore.istoreos.com` / `repo.istoreos.com` 仓库直装。
+- iStore 安装会先补 `curl` / `ca-bundle`，再从 `istore.linkease.com` / `istore.istoreos.com` / `repo.istoreos.com` 仓库直装，避开 GitHub 官方脚本超时。
 - iStore 官方安装脚本只支持 `x86_64` 和 `arm64` 设备，其它架构会直接退出。
 
 ## 致谢

@@ -10,7 +10,9 @@ need_root
 ISTORE_INSTALLER_URL="${ISTORE_INSTALLER_URL:-https://github.com/linkease/openwrt-app-actions/raw/main/applications/luci-app-systools/root/usr/share/systools/istore-reinstall.run}"
 ISTORE_INSTALLER_URLS="${ISTORE_INSTALLER_URLS:-$ISTORE_INSTALLER_URL https://raw.githubusercontent.com/linkease/openwrt-app-actions/main/applications/luci-app-systools/root/usr/share/systools/istore-reinstall.run}"
 ISTORE_STORE_REPOS="${ISTORE_STORE_REPOS:-https://istore.linkease.com/repo/all/store https://istore.istoreos.com/repo/all/store https://repo.istoreos.com/repo/all/store}"
+ISTORE_INSTALL_MODE="${ISTORE_INSTALL_MODE:-repo}"
 installer_file="/tmp/istore-reinstall.run"
+pkg_updated=0
 
 detect_arch() {
     machine="$(uname -m 2>/dev/null || true)"
@@ -77,6 +79,30 @@ download_installer() {
     return 1
 }
 
+pkg_is_installed() {
+    pkg="$1"
+    case "$pkg_mgr" in
+        apk) apk info -e "$pkg" >/dev/null 2>&1 ;;
+        opkg) opkg status "$pkg" 2>/dev/null | grep -q '^Status: .* installed' ;;
+    esac
+}
+
+ensure_pkg() {
+    pkg="$1"
+    cmd="${2:-}"
+
+    [ -n "$cmd" ] && command -v "$cmd" >/dev/null 2>&1 && return 0
+    pkg_is_installed "$pkg" && return 0
+
+    if [ "$pkg_updated" = "0" ]; then
+        pkg_update || warn "软件源更新失败，继续尝试安装依赖"
+        pkg_updated=1
+    fi
+
+    log "安装依赖: $pkg"
+    pkg_install_one "$pkg"
+}
+
 install_from_store_repo() {
     workdir="/tmp/istore-install.$$"
     mkdir -p "$workdir"
@@ -134,23 +160,29 @@ case "$pkg_mgr" in
     *) die "没有检测到支持的软件包管理器" ;;
 esac
 
-if ! command -v curl >/dev/null 2>&1 && ! command -v wget >/dev/null 2>&1; then
-    log "安装下载工具 curl"
-    pkg_update || warn "软件源更新失败，继续尝试安装 curl"
-    pkg_install_one curl || die "安装 curl 失败，请先配置可用软件源"
-fi
+ensure_pkg ca-bundle || warn "安装 ca-bundle 失败，继续尝试安装 iStore"
+ensure_pkg curl curl || die "安装 curl 失败，请先配置可用软件源"
+ensure_pkg tar tar || warn "安装 tar 失败，继续尝试使用系统自带 tar"
 
 log "检测到支持架构: $arch"
-log "下载 iStore 官方安装脚本"
-if download_installer; then
+
+if [ "$ISTORE_INSTALL_MODE" = "official" ]; then
+    log "下载 iStore 官方安装脚本"
+    download_installer || die "下载 iStore 官方安装脚本失败"
     [ -s "$installer_file" ] || die "下载文件为空: $installer_file"
     chmod 755 "$installer_file"
 
     log "安装 / 更新 iStore"
     sh "$installer_file"
 else
-    warn "官方安装脚本下载失败，改用 iStore 仓库直装"
-    install_from_store_repo || die "iStore 仓库直装失败"
+    log "使用 iStore 仓库直装，避开 GitHub 官方脚本下载"
+    if ! install_from_store_repo; then
+        warn "iStore 仓库直装失败，改用官方安装脚本"
+        download_installer || die "iStore 仓库直装和官方脚本下载都失败"
+        [ -s "$installer_file" ] || die "下载文件为空: $installer_file"
+        chmod 755 "$installer_file"
+        sh "$installer_file"
+    fi
 fi
 refresh_luci
 log "iStore 安装完成，请在 LuCI 菜单中查看 iStore / 软件中心"

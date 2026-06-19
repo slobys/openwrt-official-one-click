@@ -4,28 +4,28 @@
 
 ## 一键使用
 
-推荐安装一个菜单命令，后续直接输入 `openwrt-easy`：
+国内用户推荐用 Gitee + `wget` 安装菜单命令，后续直接输入 `openwrt-easy`：
 
 ```sh
-curl -kfsSL -o /usr/bin/openwrt-easy https://raw.githubusercontent.com/slobys/openwrt-official-one-click/main/bootstrap.sh && chmod +x /usr/bin/openwrt-easy && openwrt-easy
+wget -qO /usr/bin/openwrt-easy https://gitee.com/naiyou88/openwrt-official-one-click/raw/main/bootstrap.sh && chmod +x /usr/bin/openwrt-easy && RAW_BASE=https://gitee.com/naiyou88/openwrt-official-one-click/raw/main openwrt-easy
 ```
 
-如果系统没有 `curl`，可以试试 `wget`：
-
-```sh
-wget -qO /usr/bin/openwrt-easy https://raw.githubusercontent.com/slobys/openwrt-official-one-click/main/bootstrap.sh && chmod +x /usr/bin/openwrt-easy && openwrt-easy
-```
-
-国内用户可用 Gitee：
+如果系统已经有 `curl`，也可以用 Gitee：
 
 ```sh
 curl -kfsSL -o /usr/bin/openwrt-easy https://gitee.com/naiyou88/openwrt-official-one-click/raw/main/bootstrap.sh && chmod +x /usr/bin/openwrt-easy && RAW_BASE=https://gitee.com/naiyou88/openwrt-official-one-click/raw/main openwrt-easy
 ```
 
-国内机器如果没有 `curl`，直接用 Gitee 的 `wget` 命令：
+GitHub 源：
 
 ```sh
-wget -qO /usr/bin/openwrt-easy https://gitee.com/naiyou88/openwrt-official-one-click/raw/main/bootstrap.sh && chmod +x /usr/bin/openwrt-easy && RAW_BASE=https://gitee.com/naiyou88/openwrt-official-one-click/raw/main openwrt-easy
+wget -qO /usr/bin/openwrt-easy https://raw.githubusercontent.com/slobys/openwrt-official-one-click/main/bootstrap.sh && chmod +x /usr/bin/openwrt-easy && openwrt-easy
+```
+
+GitHub `curl` 源：
+
+```sh
+curl -kfsSL -o /usr/bin/openwrt-easy https://raw.githubusercontent.com/slobys/openwrt-official-one-click/main/bootstrap.sh && chmod +x /usr/bin/openwrt-easy && openwrt-easy
 ```
 
 完整项目方式：

@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.4.4
+
+- README 将国内首装命令改为 Gitee + `wget` 优先，避免新刷机系统没有 `curl` 时复制推荐命令直接失败。
+
 ## 0.4.3
 
 - PassWall `.run` 安装时抑制 APK 自带的 `rpcd reload`，避免通过 iStore 安装仍触发 LuCI “丢失登录状态”弹窗。

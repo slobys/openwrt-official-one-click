@@ -69,10 +69,26 @@ install_pkg() {
     return 1
 }
 
+set_timezone() {
+    command -v uci >/dev/null 2>&1 || {
+        warn "缺少 uci，跳过时区设置"
+        return 0
+    }
+
+    log "设置时区: Asia/Shanghai"
+    uci -q set system.@system[0].zonename='Asia/Shanghai' || true
+    uci -q set system.@system[0].timezone='CST-8' || true
+    uci -q commit system || warn "时区配置保存失败"
+    [ -x /etc/init.d/system ] && /etc/init.d/system reload >/dev/null 2>&1 || true
+    [ -x /etc/init.d/sysntpd ] && /etc/init.d/sysntpd restart >/dev/null 2>&1 || true
+}
+
 restore_openwrt_wget
 
 log "更新软件源"
 pkg_update || warn "软件源更新失败，继续尝试安装常用包"
+
+set_timezone
 
 install_pkg ca-bundle || true
 install_pkg curl || true

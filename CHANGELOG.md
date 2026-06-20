@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.4.6
+
+- iStore 安装完成后刷新 LuCI 菜单缓存并 reload Web 相关服务，减少必须重启系统才显示软件中心的问题。
+- 基础初始化增加时区设置，统一写入 `Asia/Shanghai` / `CST-8`。
+- PassWall `.run` 安装前先补装并校验 `kmod-nft-socket`、`kmod-nft-tproxy`，避免安装完成后运行时报 nftables 透明代理基础依赖缺失。
+
 ## 0.4.5
 
 - 修复 PassWall `.run` 手动执行 postinst 时，OpenWrt `/lib/functions.sh` 在 `set -u` 下因 `IPKG_INSTROOT` 未定义导致安装中断的问题。

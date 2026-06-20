@@ -61,7 +61,7 @@ OPENWRT_EASY_FORCE_UPDATE=1 RAW_BASE=https://gitee.com/naiyou88/openwrt-official
 ## 菜单功能
 
 ```text
-1. 基础初始化（中文界面 / SFTP / 常用下载工具）
+1. 基础初始化（时区 / 中文界面 / SFTP / 常用下载工具）
 2. 自定义 overlay 扩容
 3. 安装 / 更新 iStore 软件中心
 4. 安装 Argon 主题
@@ -71,7 +71,7 @@ OPENWRT_EASY_FORCE_UPDATE=1 RAW_BASE=https://gitee.com/naiyou88/openwrt-official
 
 ## 这篇教程里适合一键化的部分
 
-- 基础初始化：安装 SFTP、中文语言包、常用下载工具，重启 LuCI 服务。
+- 基础初始化：设置 `Asia/Shanghai` 时区，安装 SFTP、中文语言包、常用下载工具。
 - overlay 扩容：检测 overlayfs、选择磁盘、创建 ext4 分区、写入 fstab。
 - iStore 软件中心：优先使用 iStore 仓库直装，失败时改用官方 `istore-reinstall.run`，只允许 `x86_64` 和 `arm64` 设备执行。
 - Argon 主题：下载并安装教程里的主题 APK。
@@ -88,7 +88,7 @@ OPENWRT_EASY_FORCE_UPDATE=1 RAW_BASE=https://gitee.com/naiyou88/openwrt-official
 |------|------|
 | `bootstrap.sh` | 安装并启动 `openwrt-easy` 菜单 |
 | `menu.sh` | 菜单入口 |
-| `system-init.sh` | 中文界面、SFTP、常用工具 |
+| `system-init.sh` | 时区、中文界面、SFTP、常用工具 |
 | `expand-overlay.sh` | overlay 扩容 |
 | `istore.sh` | 安装 / 更新 iStore 软件中心 |
 | `theme-argon.sh` | Argon 主题安装 |
@@ -100,6 +100,7 @@ OPENWRT_EASY_FORCE_UPDATE=1 RAW_BASE=https://gitee.com/naiyou88/openwrt-official
 - overlay 扩容会修改分区表，执行前先备份配置。
 - 基础初始化会恢复 OpenWrt 默认的 `uclient-fetch` wget；OpenWrt 25.12 的 apk 在部分机型上会被完整 wget / wget-nossl 影响。
 - iStore 安装会先补 `curl` / `ca-bundle`，再从 `istore.linkease.com` / `istore.istoreos.com` / `repo.istoreos.com` 仓库直装，避开 GitHub 官方脚本超时。
+- iStore 安装完成后会刷新 LuCI 菜单缓存和 Web 服务，让软件中心尽量不重启系统就出现在菜单里。
 - iStore 官方安装脚本只支持 `x86_64` 和 `arm64` 设备，其它架构会直接退出。
 
 ## 致谢

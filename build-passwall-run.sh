@@ -221,11 +221,17 @@ install_passwall_nft_kmods() {
         apk info -e "\$pkg" >/dev/null 2>&1 || missing="\$missing \$pkg"
     done
 
-    [ -n "\$missing" ] || return 0
+    if [ -n "\$missing" ]; then
+        log "安装 PassWall nftables 透明代理内核依赖:\$missing"
+        apk update || warn "apk update 失败，继续尝试安装 kmod"
+        apk add \$missing || die "安装 PassWall nftables 透明代理内核依赖失败，请检查官方软件源和内核版本是否匹配"
+    fi
 
-    log "安装 PassWall nftables 透明代理内核依赖:\$missing"
-    apk update || warn "apk update 失败，继续尝试安装 kmod"
-    apk add \$missing || die "安装 PassWall nftables 透明代理内核依赖失败，请检查官方软件源和内核版本是否匹配"
+    missing=""
+    for pkg in kmod-nft-socket kmod-nft-tproxy; do
+        apk info -e "\$pkg" >/dev/null 2>&1 || missing="\$missing \$pkg"
+    done
+    [ -z "\$missing" ] || die "PassWall nftables 透明代理内核依赖仍缺失:\$missing"
 
     if command -v modprobe >/dev/null 2>&1; then
         modprobe nft_socket >/dev/null 2>&1 || true
@@ -310,6 +316,7 @@ set -- "\$tmp_dir"/apks/*.apk
 [ -e "\$1" ] || die "安装包损坏：没有找到 APK"
 
 log "安装 PassWall \$PASSWALL_VERSION"
+install_passwall_nft_kmods
 IPKG_NO_SCRIPT=1 apk add --allow-untrusted "\$@"
 run_passwall_postinst_basics
 ensure_passwall_defaults

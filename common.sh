@@ -94,6 +94,24 @@ refresh_luci() {
     rm -rf /tmp/luci-modulecache 2>/dev/null || true
 }
 
+reload_luci_menu() {
+    refresh_luci
+
+    if command -v luci-reload >/dev/null 2>&1; then
+        luci-reload >/dev/null 2>&1 || true
+    fi
+
+    if [ -x /etc/init.d/rpcd ]; then
+        /etc/init.d/rpcd reload >/dev/null 2>&1 || /etc/init.d/rpcd restart >/dev/null 2>&1 || true
+    fi
+
+    if [ -x /etc/init.d/uhttpd ]; then
+        /etc/init.d/uhttpd reload >/dev/null 2>&1 || /etc/init.d/uhttpd restart >/dev/null 2>&1 || true
+    fi
+
+    refresh_luci
+}
+
 script_dir() {
     CDPATH= cd -- "$(dirname -- "$0")" && pwd
 }

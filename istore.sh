@@ -184,5 +184,5 @@ else
         sh "$installer_file"
     fi
 fi
-refresh_luci
+reload_luci_menu
 log "iStore 安装完成，请在 LuCI 菜单中查看 iStore / 软件中心"

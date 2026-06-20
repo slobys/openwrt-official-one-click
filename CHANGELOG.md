@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.4.5
+
+- 修复 PassWall `.run` 手动执行 postinst 时，OpenWrt `/lib/functions.sh` 在 `set -u` 下因 `IPKG_INSTROOT` 未定义导致安装中断的问题。
+
 ## 0.4.4
 
 - README 将国内首装命令改为 Gitee + `wget` 优先，避免新刷机系统没有 `curl` 时复制推荐命令直接失败。

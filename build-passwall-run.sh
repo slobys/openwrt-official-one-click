@@ -235,6 +235,10 @@ install_passwall_nft_kmods() {
 
 run_passwall_postinst_basics() {
     [ -s /lib/functions.sh ] || return 0
+    export IPKG_INSTROOT="\${IPKG_INSTROOT:-}"
+    export PKG_UPGRADE="\${PKG_UPGRADE:-0}"
+
+    set +u
     . /lib/functions.sh
 
     for pkgname in \\
@@ -247,6 +251,7 @@ run_passwall_postinst_basics() {
         add_group_and_user >/dev/null 2>&1 || true
         default_postinst >/dev/null 2>&1 || true
     done
+    set -u
 }
 
 ensure_passwall_defaults() {

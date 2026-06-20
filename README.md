@@ -100,7 +100,7 @@ OPENWRT_EASY_FORCE_UPDATE=1 RAW_BASE=https://gitee.com/naiyou88/openwrt-official
 - overlay 扩容会修改分区表，执行前先备份配置。
 - 基础初始化会恢复 OpenWrt 默认的 `uclient-fetch` wget；OpenWrt 25.12 的 apk 在部分机型上会被完整 wget / wget-nossl 影响。
 - iStore 安装会先补 `curl` / `ca-bundle`，再从 `istore.linkease.com` / `istore.istoreos.com` / `repo.istoreos.com` 仓库直装，避开 GitHub 官方脚本超时。
-- iStore 安装完成后会刷新 LuCI 菜单缓存和 Web 服务，让软件中心尽量不重启系统就出现在菜单里。
+- iStore 安装完成后会刷新 LuCI 菜单缓存、重启 Web 相关服务并启动 `tasks`，让软件中心尽量不重启系统就出现在菜单里。
 - iStore 官方安装脚本只支持 `x86_64` 和 `arm64` 设备，其它架构会直接退出。
 
 ## 致谢

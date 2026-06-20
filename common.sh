@@ -102,11 +102,15 @@ reload_luci_menu() {
     fi
 
     if [ -x /etc/init.d/rpcd ]; then
-        /etc/init.d/rpcd reload >/dev/null 2>&1 || /etc/init.d/rpcd restart >/dev/null 2>&1 || true
+        /etc/init.d/rpcd restart >/dev/null 2>&1 || true
     fi
 
     if [ -x /etc/init.d/uhttpd ]; then
-        /etc/init.d/uhttpd reload >/dev/null 2>&1 || /etc/init.d/uhttpd restart >/dev/null 2>&1 || true
+        /etc/init.d/uhttpd restart >/dev/null 2>&1 || true
+    fi
+
+    if [ -x /etc/init.d/nginx ]; then
+        /etc/init.d/nginx restart >/dev/null 2>&1 || true
     fi
 
     refresh_luci

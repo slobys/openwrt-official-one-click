@@ -287,6 +287,27 @@ verify_passwall_cores() {
     [ -z "\$missing" ] || die "PassWall 核心安装不完整，缺少:\$missing"
 }
 
+stabilize_passwall_runtime() {
+    if [ -x /etc/init.d/firewall ]; then
+        log "刷新防火墙运行态"
+        /etc/init.d/firewall restart >/dev/null 2>&1 || /etc/init.d/firewall reload >/dev/null 2>&1 || true
+    fi
+
+    if [ -x /etc/init.d/dnsmasq ]; then
+        log "刷新 dnsmasq 运行态"
+        /etc/init.d/dnsmasq restart >/dev/null 2>&1 || true
+    fi
+
+    for svc in passwall passwall_server; do
+        [ -x "/etc/init.d/\$svc" ] || continue
+        log "重启服务: \$svc"
+        "/etc/init.d/\$svc" enable >/dev/null 2>&1 || true
+        "/etc/init.d/\$svc" stop >/dev/null 2>&1 || true
+        sleep 1
+        "/etc/init.d/\$svc" start >/dev/null 2>&1 || "/etc/init.d/\$svc" restart >/dev/null 2>&1 || true
+    done
+}
+
 [ "\$(id -u)" = "0" ] || die "请使用 root 用户执行"
 need_cmd apk
 need_cmd awk
@@ -322,6 +343,7 @@ run_passwall_postinst_basics
 ensure_passwall_defaults
 install_passwall_nft_kmods
 verify_passwall_cores
+stabilize_passwall_runtime
 refresh_luci
 
 installed="\$(apk info -a luci-app-passwall 2>/dev/null | sed -n 's/^version: //p' | head -n1 || true)"

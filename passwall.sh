@@ -125,6 +125,27 @@ verify_passwall_cores() {
     [ -z "$missing" ] || die "PassWall 核心安装不完整，缺少:$missing"
 }
 
+stabilize_passwall_runtime() {
+    if [ -x /etc/init.d/firewall ]; then
+        log "刷新防火墙运行态"
+        /etc/init.d/firewall restart >/dev/null 2>&1 || /etc/init.d/firewall reload >/dev/null 2>&1 || true
+    fi
+
+    if [ -x /etc/init.d/dnsmasq ]; then
+        log "刷新 dnsmasq 运行态"
+        /etc/init.d/dnsmasq restart >/dev/null 2>&1 || true
+    fi
+
+    for svc in passwall passwall_server; do
+        [ -x "/etc/init.d/$svc" ] || continue
+        log "重启服务: $svc"
+        "/etc/init.d/$svc" enable >/dev/null 2>&1 || true
+        "/etc/init.d/$svc" stop >/dev/null 2>&1 || true
+        sleep 1
+        "/etc/init.d/$svc" start >/dev/null 2>&1 || "/etc/init.d/$svc" restart >/dev/null 2>&1 || true
+    done
+}
+
 install_passwall_apks() {
     install_passwall_nft_kmods
     IPKG_NO_SCRIPT=1 apk add --allow-untrusted "$@"
@@ -132,6 +153,7 @@ install_passwall_apks() {
     ensure_passwall_defaults
     install_passwall_nft_kmods
     verify_passwall_cores
+    stabilize_passwall_runtime
     refresh_luci
 }
 

@@ -151,6 +151,13 @@ install_from_store_repo() {
     return 1
 }
 
+start_istore_services() {
+    if [ -x /etc/init.d/tasks ]; then
+        /etc/init.d/tasks enable >/dev/null 2>&1 || true
+        /etc/init.d/tasks restart >/dev/null 2>&1 || /etc/init.d/tasks start >/dev/null 2>&1 || true
+    fi
+}
+
 arch="$(detect_arch || true)"
 [ -n "$arch" ] || die "iStore 官方安装脚本只支持 x86_64 和 arm64 设备"
 
@@ -184,5 +191,6 @@ else
         sh "$installer_file"
     fi
 fi
+start_istore_services
 reload_luci_menu
 log "iStore 安装完成，请在 LuCI 菜单中查看 iStore / 软件中心"

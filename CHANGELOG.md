@@ -1,5 +1,10 @@
 # Changelog
 
+## 0.4.7
+
+- iStore 安装后改为明确重启 `rpcd` / `uhttpd` / `nginx`，并启动 `tasks` 服务，解决只清缓存后仍要重启系统才显示菜单的问题。
+- PassWall `.run` 安装完成后刷新防火墙和 dnsmasq 运行态，并 enable/start `passwall`、`passwall_server` 服务，减少必须重启软路由才稳定的问题。
+
 ## 0.4.6
 
 - iStore 安装完成后刷新 LuCI 菜单缓存并 reload Web 相关服务，减少必须重启系统才显示软件中心的问题。
